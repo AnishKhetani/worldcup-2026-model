@@ -1,0 +1,56 @@
+name: Update predictions & deploy
+
+# Re-pull data, re-run the model, rebuild the site and deploy to GitHub Pages.
+# Runs every 3 hours so predictions and the track record are always refreshed before
+# the next matchday (knockout matches come thick and fast). Also runnable on demand.
+on:
+  schedule:
+    - cron: "0 */3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["src/**", ".github/workflows/update.yml"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never run two deploys at once; let the latest win.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Pull the latest World Cup + international data (best-effort; the build below is
+      # the real gate — it fails loudly if the required CC0 data is missing).
+      - name: Fetch latest data
+        working-directory: src
+        run: python wc_fetch.py || true
+
+      - name: Build predictions + site
+        working-directory: src
+        run: python build_site.py
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

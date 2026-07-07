@@ -104,7 +104,7 @@ def validate_wc_csvs(problems: list[str]) -> pd.DataFrame | None:
 
 
 def validate_intl(problems: list[str]) -> None:
-    from wc_intl_elo import RESULTS_CSV
+    from wc_train import RESULTS_CSV
     print("\n" + "=" * 70)
     print("SOURCE 2 -- international results history (martj42, CC0)")
     print("=" * 70)

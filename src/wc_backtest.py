@@ -1,68 +1,22 @@
-"""Walk-forward, strictly chronological backtest of the strength-prior Dixon-Coles
-model on World Cup 2026 matches already played.
+"""Walk-forward backtest report for the per-team Dixon-Coles model.
 
-For each target match (in date order), the model is refit on ONLY the matches played on
-an earlier date, then predicts that match's normal-time H/D/A. The pre-tournament Elo
-prior is known before kickoff, so the only thing learned walk-forward is the handful of
-global coefficients — no lookahead. Matches share dates, so training on strictly-earlier
-DATES (not just earlier rows) avoids same-day leakage.
+Reuses the honest, lookahead-free walk-forward predictions from build_results_log (each
+completed match predicted from only earlier-dated internationals), and reports the
+model's normal-time H/D/A calibration: multiclass log loss, Brier, accuracy, and a
+one-vs-rest reliability table with ECE, against a base-rate baseline.
 
-Reports, on the held-out predictions: multiclass log loss, Brier, accuracy, and a
-one-vs-rest reliability table (predicted vs actual outcome frequency) with ECE — versus
-a base-rate baseline that predicts the training H/D/A frequencies.
-
-NOTE ON SAMPLE SIZE: this is a few dozen predictions from one tournament. It is a
-calibration check and a live demo, NOT a backtested trading system — the 1,000+
-settled-bet bar for claiming an edge does not apply here and no edge is claimed.
+NOTE ON SAMPLE SIZE: this is a few dozen predictions from one tournament -- a
+calibration check / live demo, not a backtested trading system. No edge is claimed.
 """
 from __future__ import annotations
 
 import sys
 
 import numpy as np
-import pandas as pd
 
-from wc_config import PROCESSED_DIR
-from wc_data import load_played_matches
-from wc_dixon_coles import DixonColesStrength
+from build_results_log import build_log, track_record
 
-MIN_TRAIN = 20          # need a couple of matchdays before the first prediction
 CLASSES = ["H", "D", "A"]
-
-
-def _logloss(probs: np.ndarray, y_idx: np.ndarray) -> float:
-    p = np.clip(probs[np.arange(len(y_idx)), y_idx], 1e-15, 1.0)
-    return float(-np.mean(np.log(p)))
-
-
-def _brier(probs: np.ndarray, y_idx: np.ndarray) -> float:
-    onehot = np.eye(3)[y_idx]
-    return float(np.mean(np.sum((probs - onehot) ** 2, axis=1)))
-
-
-def run_backtest() -> pd.DataFrame:
-    df = load_played_matches()
-    rows = []
-    for i in range(len(df)):
-        target = df.iloc[i]
-        train = df[df["date"] < target["date"]]
-        if len(train) < MIN_TRAIN:
-            continue
-        model = DixonColesStrength().fit(train)
-        # matches were actually played with a designated home side -> neutral=False
-        p_h, p_d, p_a = model.predict_outcome(
-            target["home_strength"], target["away_strength"], neutral=False)
-        base = train["result90"].value_counts(normalize=True)
-        rows.append({
-            "match_id": target["match_id"], "date": target["date"],
-            "stage": target["stage"], "home_team": target["home_team"],
-            "away_team": target["away_team"], "result90": target["result90"],
-            "p_home": p_h, "p_draw": p_d, "p_away": p_a,
-            "n_train": len(train),
-            "base_H": base.get("H", 1 / 3), "base_D": base.get("D", 1 / 3),
-            "base_A": base.get("A", 1 / 3),
-        })
-    return pd.DataFrame(rows)
 
 
 def reliability_table(probs: np.ndarray, y_idx: np.ndarray, n_bins: int = 5):
@@ -84,26 +38,23 @@ def reliability_table(probs: np.ndarray, y_idx: np.ndarray, n_bins: int = 5):
 
 
 def main() -> int:
-    bt = run_backtest()
-    if bt.empty:
-        print("Not enough matches to backtest.")
+    df = build_log()
+    done = df[df["completed"] == True]  # noqa: E712
+    if done.empty:
+        print("No completed matches to backtest.")
         return 1
-    y = bt["result90"].map({c: i for i, c in enumerate(CLASSES)}).to_numpy()
-    P = bt[["p_home", "p_draw", "p_away"]].to_numpy()
-    B = bt[["base_H", "base_D", "base_A"]].to_numpy()
+    tr = track_record(df)
+    y = done["actual"].map({c: i for i, c in enumerate(CLASSES)}).to_numpy()
+    P = done[["p_home", "p_draw", "p_away"]].to_numpy(float)
 
     print("=" * 70)
-    print("WORLD CUP 2026 - walk-forward Dixon-Coles backtest (normal-time H/D/A)")
+    print("WORLD CUP 2026 - walk-forward per-team Dixon-Coles backtest (90' H/D/A)")
     print("=" * 70)
-    print(f"Predictions: {len(bt)} matches "
-          f"({bt['date'].min().date()} .. {bt['date'].max().date()}), "
-          f"expanding train window from {MIN_TRAIN}+ matches.\n")
+    print(f"Predictions: {tr['n']} completed matches, each refit on only earlier data.\n")
 
     print(f"{'model':<18}{'log loss':>10}{'brier':>9}{'accuracy':>10}")
-    acc = float((P.argmax(1) == y).mean())
-    base_acc = float((B.argmax(1) == y).mean())
-    print(f"{'Dixon-Coles':<18}{_logloss(P, y):>10.4f}{_brier(P, y):>9.4f}{acc:>10.3f}")
-    print(f"{'base-rate':<18}{_logloss(B, y):>10.4f}{_brier(B, y):>9.4f}{base_acc:>10.3f}")
+    print(f"{'Dixon-Coles':<18}{tr['log_loss']:>10.4f}{tr['brier']:>9.4f}{tr['accuracy']:>10.3f}")
+    print(f"{'base-rate':<18}{tr['base_log_loss']:>10.4f}{'':>9}{'':>10}")
 
     print("\nActual vs mean-predicted outcome frequency:")
     for c, i in zip(CLASSES, range(3)):
@@ -115,10 +66,7 @@ def main() -> int:
     for label, cnt, conf, obs in rows:
         print(f"  {label:<12}{cnt:>5}{conf:>9.3f}{obs:>9.3f}")
     print(f"  ECE = {ece:.4f}")
-
-    out = PROCESSED_DIR / "wc_backtest_predictions.csv"
-    bt.to_csv(out, index=False)
-    print(f"\nSaved per-match predictions: {out}")
+    print(f"\nCorrect calls: {tr['correct']}/{tr['n']} ({tr['accuracy']:.1%}).")
     print("\nNOTE: small single-tournament sample - a calibration check / live demo, "
           "not a\nbacktested trading system. No edge is claimed at this sample size.")
     return 0

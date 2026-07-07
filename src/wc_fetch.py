@@ -61,7 +61,7 @@ def main(argv=None) -> int:
 
     print("\n--- Source 2: all-international results history (martj42, CC0) ---")
     try:
-        from wc_intl_elo import RESULTS_CSV, download
+        from wc_train import RESULTS_CSV, download
         download(force=force)
         ok_intl = RESULTS_CSV.exists()
         print(f"  results.csv                {'present' if ok_intl else 'MISSING'} "
@@ -70,9 +70,21 @@ def main(argv=None) -> int:
         ok_intl = False
         print(f"  results.csv                error ({type(e).__name__})")
 
+    print("\n--- Source 3: Fjelstul World Cup Database (CC-BY-SA 4.0) ---")
+    try:
+        from wc_knockout import FJELSTUL_CSV, download_fjelstul
+        download_fjelstul(force=force)
+        ok_fj = FJELSTUL_CSV.exists()
+        print(f"  matches.csv                {'present' if ok_fj else 'MISSING'} "
+              f"({FJELSTUL_CSV.stat().st_size:,} bytes)" if ok_fj else "")
+    except Exception as e:
+        ok_fj = False
+        print(f"  matches.csv                error ({type(e).__name__})")
+
     print(f"\nDone. {n_csv}/{len(WC_CSV_FILES)} CC0 CSVs present; "
-          f"intl history {'present' if ok_intl else 'MISSING'}.")
-    return 0 if (n_csv and ok_intl) else 1
+          f"intl history {'present' if ok_intl else 'MISSING'}; "
+          f"Fjelstul WC DB {'present' if ok_fj else 'MISSING'}.")
+    return 0 if (n_csv and ok_intl and ok_fj) else 1
 
 
 if __name__ == "__main__":

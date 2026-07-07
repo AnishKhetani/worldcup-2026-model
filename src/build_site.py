@@ -22,11 +22,12 @@ SITE_DIR = Path(__file__).resolve().parents[1] / "site"
 REPO_URL = "https://github.com/AnishKhetani/worldcup-2026-model"
 SITE_URL = "https://anishkhetani.github.io/worldcup-2026-model/"
 
-PAGE_TITLE = "World Cup 2026 Predictions — Dixon-Coles Poisson &amp; Elo Model"
+PAGE_TITLE = "World Cup 2026 Predictions — per-team Dixon-Coles Poisson Model"
 META_DESCRIPTION = (
-    "Live, auto-updating World Cup 2026 knockout predictions from a Dixon-Coles "
-    "Poisson goal model with international Elo ratings (1872-present). Public, "
-    "walk-forward-validated track record — no betting odds, no lookahead."
+    "Live, auto-updating World Cup 2026 knockout predictions from a per-team "
+    "Dixon-Coles Poisson goal model fit on a century of international results "
+    "(1872-present). Public, walk-forward-validated track record — no betting odds, "
+    "no lookahead."
 )
 
 CSS = """
@@ -167,9 +168,9 @@ def render(df: pd.DataFrame, tr: dict, updated: str) -> str:
 {head_meta}
 {css}</head><body><div class="wrap">
 <h1>World Cup 2026 — Model Predictions</h1>
-<p class="sub">A Dixon-Coles Poisson goal model with international Elo ratings predicts
-the remaining World Cup 2026 knockout fixtures, and this page tracks the live record
-of those predictions against actual results.</p>
+<p class="sub">A per-team Dixon-Coles Poisson goal model predicts the remaining World Cup
+2026 knockout fixtures, and this page tracks the live record of those predictions
+against actual results.</p>
 <div class="disc"><b>Research / analytics project — not betting advice.</b> These are
 model probabilities published for interest and to keep the model honest against real
 results. No wagering guidance is given or implied.</div>
@@ -184,10 +185,14 @@ is a naive predictor for comparison.</p>
 {record}
 
 <h2>How it works</h2>
-<p class="sub">A Dixon-Coles Poisson goal model. Team strength comes from a rolling Elo
-over ~49k international matches (1872–present); the goal-rate coefficients are fit on
-~25k pre-tournament internationals. Every prediction uses only information available
-<i>before</i> the match — no lookahead. Full method: <a href="{REPO_URL}/blob/main/SPEC.md">SPEC.md</a>.</p>
+<p class="sub">A Dixon-Coles Poisson goal model that fits a separate <i>attack</i> and
+<i>defence</i> rating for every team by weighted maximum-likelihood on ~17k
+international matches (recent games and major tournaments weighted more), with a
+two-sided home-advantage term and the standard low-scoring-draw correction. Knockout
+progression (extra time / penalties) uses a favorite-conversion calibrated on 92 years
+of World Cup knockout history — not a coin-flip shootout. Each match is predicted
+walk-forward from only earlier games, so there is no lookahead. Full method:
+<a href="{REPO_URL}/blob/main/SPEC.md">SPEC.md</a>.</p>
 
 <div class="foot">
 Updated {updated} UTC · Data: <a href="https://github.com/mominullptr/FIFA-World-Cup-2026-Dataset">FIFA World Cup 2026 Dataset</a>

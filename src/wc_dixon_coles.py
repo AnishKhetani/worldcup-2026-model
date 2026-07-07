@@ -1,59 +1,48 @@
-"""Strength-prior Dixon-Coles goal-rate model for World Cup 2026 knockout matches.
+"""Per-team Dixon-Coles match-outcome model (change #2).
 
-Why this shape (and not a textbook per-team Dixon-Coles):
-  A classic Dixon-Coles fits an attack and a defence parameter for every team. With 48
-  teams and ~3 games each, 96 free team parameters are hopelessly under-identified. So
-  here the team parameters are NOT free: a team's attack and defence are TIED to its
-  pre-tournament Elo strength `s` (a z-score; see wc_data). Only FIVE global
-  coefficients are fit from the played matches:
+Each team gets its OWN attack and defence parameter, fit by weighted maximum-likelihood
+on the full international pool (wc_train.build_training_set) -- not collapsed onto a
+single Elo strength scalar. This separates a high-scoring-but-leaky side from a solid
+defensive one of equal net strength, which a one-number strength model cannot.
 
-      log(lambda_home) = mu + gamma*home + a*s_home - d*s_away        (home goal rate)
-      log(lambda_away) = mu          + a*s_away - d*s_home            (away goal rate)
+Goal model (home team i vs away team j):
+    log lambda_home = mu + home_adv*(non-neutral) + neutral_edge*(neutral)
+                         + attack[i] - defense[j]
+    log lambda_away = mu - home_def*(non-neutral)
+                         + attack[j] - defense[i]
+with the Dixon-Coles low-score correction tau(x, y; rho).
 
-    mu    baseline log goal-rate      a  how much own strength lifts scoring
-    gamma home-field bump             d  how much opponent strength suppresses scoring
-    rho   Dixon-Coles low-score correction (the standard 0-0/1-0/0-1/1-1 adjustment)
+Venue advantage is TWO-SIDED and jointly estimated, keyed by the `neutral` flag:
+  * home_adv    -- home-scoring boost on non-neutral matches.
+  * home_def    -- away-scoring SUPPRESSION on non-neutral matches (the half a
+                   one-sided spec misses; "away sides create less at a hostile venue"
+                   is what actually lifts the home win probability into calibration).
+  * neutral_edge -- a small, ridge-shrunk seed edge for the nominally-listed home team
+                   on a neutral venue (World Cup ties are neutral, so this is ~0).
 
-  This is a genuine Poisson goal-rate model with the standard low-scoring-draw
-  correction; it just sources team strength from the Elo prior instead of estimating it
-  from this tournament's small sample, exactly as required. If a == d it collapses to a
-  pure supremacy model; letting them differ lets the played matches say whether strong
-  teams win more by scoring more or by conceding less.
+Each match carries a `weight` (Dixon-Coles time decay x tournament tier; see wc_train).
+A light ridge (Gaussian prior on attack/defence) stabilises sparse teams. The negative
+log-posterior and its gradient are analytic, so walk-forward refits are fast.
 
-Home advantage: `gamma` is fit from the played matches (group games at host venues do
-carry a real edge). Remaining knockout ties are predicted NEUTRAL (home=0 for both) —
-the "home" side of a neutral-venue knockout is an administrative bracket label, not a
-venue. Callers pass neutral=True for those.
-
-Progression (knockouts have no draw): a tie at 90' goes to extra time — modelled as the
-same rates scaled to 30 minutes (lambda/3) with the same rho — and, if still level, to
-penalties (50/50). So P(team progresses) is strength-tilted through extra time rather
-than a flat coin flip, and P(home progresses) + P(away progresses) = 1 by construction.
-
-The math functions are pure and unit-tested (tests/test_wc_dixon_coles.py).
+Ported from the author's separate betting-model codebase (the `wc26bet` Dixon-Coles),
+adapted to this repo and stripped of any odds/provenance coupling. Progression (extra
+time / penalties) is layered on top in wc_knockout.py, not here.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
-from scipy.optimize import minimize
+import pandas as pd
+from scipy import optimize
+from scipy.stats import poisson
 
-MAX_GOALS = 10          # score-matrix truncation for normal time
-MAX_GOALS_ET = 6        # extra time is low-scoring; a smaller grid is plenty
-ET_FRACTION = 1.0 / 3.0  # 30 added minutes ~ a third of a 90' match's goal expectation
-
-
-# --- pure Poisson / Dixon-Coles math -----------------------------------------
-def _poisson_pmf(k: np.ndarray, lam: float) -> np.ndarray:
-    from math import lgamma
-    k = np.asarray(k, float)
-    logp = -lam + k * np.log(max(lam, 1e-12)) - np.array([lgamma(int(i) + 1) for i in k])
-    return np.exp(logp)
+OUTCOMES = ("H", "D", "A")
+MAX_GOALS = 12
 
 
+# --- pure Dixon-Coles math (import-safe, unit-tested) ------------------------
 def dc_tau(x: int, y: int, lam: float, mu: float, rho: float) -> float:
-    """Dixon-Coles low-score dependence factor for the four adjusted cells."""
     if x == 0 and y == 0:
         return 1.0 - lam * mu * rho
     if x == 0 and y == 1:
@@ -65,112 +54,197 @@ def dc_tau(x: int, y: int, lam: float, mu: float, rho: float) -> float:
     return 1.0
 
 
-def score_matrix(lam: float, mu: float, rho: float,
+def score_matrix(lam_h: float, lam_a: float, rho: float,
                  max_goals: int = MAX_GOALS) -> np.ndarray:
-    """P(home=x, away=y) grid with the DC correction applied and renormalised."""
-    ks = np.arange(max_goals + 1)
-    ph = _poisson_pmf(ks, lam)
-    pa = _poisson_pmf(ks, mu)
-    mat = np.outer(ph, pa)
-    for x in (0, 1):
-        for y in (0, 1):
-            mat[x, y] *= dc_tau(x, y, lam, mu, rho)
+    px = poisson.pmf(np.arange(max_goals + 1), lam_h)
+    py = poisson.pmf(np.arange(max_goals + 1), lam_a)
+    mat = np.outer(px, py)
+    mat[0, 0] *= 1.0 - lam_h * lam_a * rho
+    mat[0, 1] *= 1.0 + lam_h * rho
+    mat[1, 0] *= 1.0 + lam_a * rho
+    mat[1, 1] *= 1.0 - rho
+    mat = np.clip(mat, 0.0, None)
     s = mat.sum()
     return mat / s if s > 0 else mat
 
 
-def outcome_probs(lam: float, mu: float, rho: float,
-                  max_goals: int = MAX_GOALS) -> tuple[float, float, float]:
-    """(P home win, P draw, P away win) in normal time."""
-    m = score_matrix(lam, mu, rho, max_goals)
-    p_home = np.tril(m, -1).sum()   # x > y
-    p_away = np.triu(m, 1).sum()    # x < y
-    p_draw = np.trace(m)            # x == y
-    return float(p_home), float(p_draw), float(p_away)
+def outcome_probs(lam_h: float, lam_a: float, rho: float) -> tuple[float, float, float]:
+    m = score_matrix(lam_h, lam_a, rho)
+    return (float(np.tril(m, -1).sum()),   # home win (x > y)
+            float(np.trace(m)),            # draw
+            float(np.triu(m, 1).sum()))    # away win (x < y)
 
 
-def progression_probs(lam: float, mu: float, rho: float) -> tuple[float, float]:
-    """(P home progresses, P away progresses) through 90' -> ET -> penalties."""
-    p_h, p_d, p_a = outcome_probs(lam, mu, rho)
-    # extra time: same rates scaled to 30 minutes, same rho
-    eh, ed, ea = outcome_probs(lam * ET_FRACTION, mu * ET_FRACTION, rho, MAX_GOALS_ET)
-    home_tiebreak = eh + ed * 0.5   # win in ET, or level-then-penalties (coin flip)
-    away_tiebreak = ea + ed * 0.5
-    p_home_prog = p_h + p_d * home_tiebreak
-    p_away_prog = p_a + p_d * away_tiebreak
-    return float(p_home_prog), float(p_away_prog)
-
-
-# --- fittable strength-prior model -------------------------------------------
+# --- fittable per-team model -------------------------------------------------
 @dataclass
-class DixonColesStrength:
+class DixonColesModel:
+    prior_sd: float = 1.0               # ridge on attack/defence (data carries signal)
+    seed_prior_sd: float = 0.15         # tighter ridge on the neutral seed-edge term
+    rho_bounds: tuple[float, float] = (-0.2, 0.2)
+    max_goals: int = MAX_GOALS
+    uncertainty_threshold: int = 3
+
+    teams: list = field(default_factory=list)
+    _index: dict = field(default_factory=dict)
+    attack: np.ndarray | None = None
+    defense: np.ndarray | None = None
     mu: float = 0.0
-    gamma: float = 0.2
-    a: float = 0.3
-    d: float = 0.3
+    home_adv: float = 0.0
+    home_def: float = 0.0
+    neutral_edge: float = 0.0
     rho: float = 0.0
-    fitted: bool = False
+    matches_played: dict = field(default_factory=dict)
+    n_train: int = 0
+    converged: bool = False
 
-    def rates(self, s_home: float, s_away: float,
-              neutral: bool = False) -> tuple[float, float]:
-        """Expected (home, away) normal-time goals for a strength matchup."""
-        home = 0.0 if neutral else 1.0
-        lam = np.exp(self.mu + self.gamma * home + self.a * s_home - self.d * s_away)
-        mu = np.exp(self.mu + self.a * s_away - self.d * s_home)
-        return float(lam), float(mu)
+    def _prep(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
+        if "home" not in df.columns and "home_team_id" in df.columns:
+            df = df.rename(columns={"home_team_id": "home", "away_team_id": "away"})
+        df = df.dropna(subset=["home", "away", "home_score", "away_score"]).copy()
+        df["home_score"] = df["home_score"].astype(int)
+        df["away_score"] = df["away_score"].astype(int)
+        if "neutral" not in df.columns:
+            df["neutral"] = False
+        if "weight" not in df.columns:
+            df["weight"] = 1.0
+        return df
 
-    # -- likelihood (vectorised across matches) ------------------------------
-    @staticmethod
-    def _nll(params, sh, sa, hg, ag, home_ind, w) -> float:
-        """Weighted negative log-likelihood. `home_ind` is 1 for the home side at a
-        real venue and 0 at a neutral one (so gamma only helps a genuine home team);
-        `w` weights each match (e.g. importance x recency for the historical fit)."""
-        from scipy.special import gammaln
-        mu0, gamma, a, d, rho = params
-        lam = np.exp(mu0 + gamma * home_ind + a * sh - d * sa)
-        mu = np.exp(mu0 + a * sa - d * sh)
-        log_ph = -lam + hg * np.log(lam) - gammaln(hg + 1.0)
-        log_pa = -mu + ag * np.log(mu) - gammaln(ag + 1.0)
-        # Dixon-Coles correction, vectorised over the four adjusted cells
-        tau = np.ones_like(lam)
-        m00 = (hg == 0) & (ag == 0); tau[m00] = 1.0 - lam[m00] * mu[m00] * rho
-        m01 = (hg == 0) & (ag == 1); tau[m01] = 1.0 + lam[m01] * rho
-        m10 = (hg == 1) & (ag == 0); tau[m10] = 1.0 + mu[m10] * rho
-        m11 = (hg == 1) & (ag == 1); tau[m11] = 1.0 - rho
-        logp = w * (log_ph + log_pa + np.log(np.clip(tau, 1e-12, None)))
-        return -float(np.sum(logp))
+    def fit(self, df: pd.DataFrame) -> "DixonColesModel":
+        df = self._prep(df)
+        teams = sorted(set(df["home"]) | set(df["away"]), key=str)
+        self.teams = teams
+        self._index = {t: k for k, t in enumerate(teams)}
+        n = len(teams)
+        self.n_train = len(df)
 
-    def fit(self, matches, weights=None, neutral=None) -> "DixonColesStrength":
-        """MLE on a matches frame (needs home/away_strength, hg90, ag90).
+        hi = df["home"].map(self._index).to_numpy()
+        ai = df["away"].map(self._index).to_numpy()
+        x = df["home_score"].to_numpy(float)
+        y = df["away_score"].to_numpy(float)
+        w = df["weight"].to_numpy(float)
+        nn = (~df["neutral"].to_numpy(bool)).astype(float)   # 1 = home-adv applies
+        nz = 1.0 - nn                                        # 1 = neutral -> seed edge
+        m00 = (x == 0) & (y == 0)
+        m01 = (x == 0) & (y == 1)
+        m10 = (x == 1) & (y == 0)
+        m11 = (x == 1) & (y == 1)
+        ridge = 1.0 / (self.prior_sd ** 2)
+        seed_ridge = 1.0 / (self.seed_prior_sd ** 2)
 
-        `weights` (per-match) enables the importance/recency-weighted historical fit;
-        `neutral` (per-match bool, or a 'neutral' column) zeroes the home bump for
-        neutral-venue matches. Both default to the plain unweighted, all-home case so
-        existing callers are unchanged.
-        """
-        sh = matches["home_strength"].to_numpy(float)
-        sa = matches["away_strength"].to_numpy(float)
-        hg = matches["hg90"].to_numpy(float)
-        ag = matches["ag90"].to_numpy(float)
-        if neutral is None:
-            neutral = matches["neutral"] if "neutral" in matches else np.zeros(len(sh))
-        home_ind = 1.0 - np.asarray(neutral, float)
-        if weights is None:
-            weights = matches["weight"] if "weight" in matches else np.ones(len(sh))
-        w = np.asarray(weights, float)
-        init = np.array([self.mu or 0.0, self.gamma, self.a, self.d, self.rho])
-        res = minimize(self._nll, init, args=(sh, sa, hg, ag, home_ind, w),
-                       method="Nelder-Mead",
-                       options={"xatol": 1e-5, "fatol": 1e-7, "maxiter": 6000})
-        self.mu, self.gamma, self.a, self.d, self.rho = (float(v) for v in res.x)
-        self.fitted = True
+        # param layout: [mu, home_adv, home_def, seed_edge, rho, attack(n), defense(n)]
+        def nll_and_grad(p):
+            mu, hadv, hdef, seed, rho = p[0], p[1], p[2], p[3], p[4]
+            att = p[5:5 + n]
+            dfn = p[5 + n:5 + 2 * n]
+            loglh = mu + hadv * nn + seed * nz + att[hi] - dfn[ai]
+            logla = mu - hdef * nn + att[ai] - dfn[hi]
+            lh = np.exp(loglh)
+            la = np.exp(logla)
+            ll = np.sum(w * (x * loglh - lh + y * logla - la))
+            tau = np.ones_like(lh)
+            tau[m00] = 1.0 - lh[m00] * la[m00] * rho
+            tau[m01] = 1.0 + lh[m01] * rho
+            tau[m10] = 1.0 + la[m10] * rho
+            tau[m11] = 1.0 - rho
+            tau = np.clip(tau, 1e-9, None)
+            ll += np.sum(w * np.log(tau))
+            penalty = 0.5 * ridge * (att @ att + dfn @ dfn) + 0.5 * seed_ridge * seed ** 2
+            nll = -ll + penalty
+
+            g_lh = w * (x - lh)
+            g_la = w * (y - la)
+            t_lh = np.zeros_like(lh)
+            t_lh[m00] = -lh[m00] * la[m00] * rho / tau[m00]
+            t_lh[m01] = lh[m01] * rho / tau[m01]
+            t_la = np.zeros_like(la)
+            t_la[m00] = -lh[m00] * la[m00] * rho / tau[m00]
+            t_la[m10] = la[m10] * rho / tau[m10]
+            g_lh = g_lh + w * t_lh
+            g_la = g_la + w * t_la
+
+            G_att = np.bincount(hi, g_lh, n) + np.bincount(ai, g_la, n)
+            G_dfn = np.bincount(ai, g_lh, n) + np.bincount(hi, g_la, n)
+            grad = np.empty_like(p)
+            grad[0] = -np.sum(g_lh + g_la)
+            grad[1] = -np.sum(g_lh * nn)
+            grad[2] = np.sum(g_la * nn)
+            grad[3] = -np.sum(g_lh * nz) + seed_ridge * seed
+            drho = np.zeros_like(lh)
+            drho[m00] = -lh[m00] * la[m00] / tau[m00]
+            drho[m01] = lh[m01] / tau[m01]
+            drho[m10] = la[m10] / tau[m10]
+            drho[m11] = -1.0 / tau[m11]
+            grad[4] = -np.sum(w * drho)
+            grad[5:5 + n] = -G_att + ridge * att
+            grad[5 + n:5 + 2 * n] = G_dfn + ridge * dfn
+            return nll, grad
+
+        avg = max((x * w).sum() / w.sum() if w.sum() else 1.0, 0.2)
+        p0 = np.zeros(5 + 2 * n)
+        p0[0] = np.log(avg)
+        p0[1] = 0.25
+        bounds = ([(None, None)] * 4 + [self.rho_bounds] + [(None, None)] * (2 * n))
+        res = optimize.minimize(nll_and_grad, p0, jac=True, method="L-BFGS-B",
+                                bounds=bounds, options={"maxiter": 1000, "ftol": 1e-10})
+        self.converged = bool(res.success)
+        p = res.x
+        self.mu, self.home_adv, self.home_def = float(p[0]), float(p[1]), float(p[2])
+        self.neutral_edge, self.rho = float(p[3]), float(p[4])
+        self.attack = p[5:5 + n].copy()
+        self.defense = p[5 + n:5 + 2 * n].copy()
+        counts = pd.concat([df["home"], df["away"]]).value_counts()
+        self.matches_played = {t: int(counts.get(t, 0)) for t in teams}
         return self
 
     # -- prediction ----------------------------------------------------------
-    def predict_outcome(self, s_home, s_away, neutral=False):
-        lam, mu = self.rates(s_home, s_away, neutral)
-        return outcome_probs(lam, mu, self.rho)
+    def _strength(self, team) -> tuple[float, float]:
+        k = self._index.get(team)
+        if k is None or self.attack is None:
+            return 0.0, 0.0
+        return float(self.attack[k]), float(self.defense[k])
 
-    def predict_progression(self, s_home, s_away, neutral=True):
-        lam, mu = self.rates(s_home, s_away, neutral)
-        return progression_probs(lam, mu, self.rho)
+    def knows(self, team) -> bool:
+        return team in self._index
+
+    def expected_goals(self, home, away, neutral: bool = False) -> tuple[float, float]:
+        ah, dh = self._strength(home)
+        aa, da = self._strength(away)
+        boost = self.neutral_edge if neutral else self.home_adv
+        suppress = 0.0 if neutral else self.home_def
+        lam_h = float(np.exp(self.mu + boost + ah - da))
+        lam_a = float(np.exp(self.mu - suppress + aa - dh))
+        return lam_h, lam_a
+
+    def predict_outcome(self, home, away, neutral: bool = False) -> dict:
+        lh, la = self.expected_goals(home, away, neutral)
+        p_h, p_d, p_a = outcome_probs(lh, la, self.rho)
+        mat = score_matrix(lh, la, self.rho, self.max_goals)
+        ij = np.unravel_index(np.argmax(mat), mat.shape)
+        return {"home": home, "away": away, "neutral": neutral,
+                "p_home": p_h, "p_draw": p_d, "p_away": p_a,
+                "exp_goals_home": lh, "exp_goals_away": la,
+                "most_likely_score": (int(ij[0]), int(ij[1])),
+                "home_matches": self.matches_played.get(home, 0),
+                "away_matches": self.matches_played.get(away, 0)}
+
+    def predict_proba(self, home, away, neutral: bool = False) -> np.ndarray:
+        o = self.predict_outcome(home, away, neutral)
+        return np.array([o["p_home"], o["p_draw"], o["p_away"]])
+
+    def is_high_uncertainty(self, team) -> bool:
+        return self.matches_played.get(team, 0) < self.uncertainty_threshold
+
+    def team_frame(self) -> pd.DataFrame:
+        rows = []
+        for t in self.teams:
+            a, d = self._strength(t)
+            rows.append({"team": t, "matches": self.matches_played.get(t, 0),
+                         "attack": round(a, 4), "defense": round(d, 4),
+                         "net_strength": round(a + d, 4)})
+        return (pd.DataFrame(rows).sort_values("net_strength", ascending=False)
+                .reset_index(drop=True))
+
+
+def fit_dixon_coles(df: pd.DataFrame, **kw) -> DixonColesModel:
+    return DixonColesModel(**kw).fit(df)

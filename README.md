@@ -1,10 +1,10 @@
 # World Cup 2026 — Model Predictions
 
-**A Dixon-Coles Poisson goal model, with team strength from a rolling international Elo
-rating, predicts the remaining World Cup 2026 knockout results** — and keeps a public
-track record against what actually happens. It re-runs itself before every matchday —
-pulling fresh data, re-predicting the upcoming fixtures, and updating the scoreboard
-automatically.
+**A per-team Dixon-Coles Poisson goal model — each team fit with its own attack and
+defence rating on international match history — predicts the remaining World Cup 2026
+knockout results**, and keeps a public track record against what actually happens. It
+re-runs itself before every matchday — pulling fresh data, re-predicting the upcoming
+fixtures, and updating the scoreboard automatically.
 
 🔗 **Live site:** <https://anishkhetani.github.io/worldcup-2026-model/>
 

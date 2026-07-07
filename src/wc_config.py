@@ -1,12 +1,13 @@
 """World Cup 2026 data-pipeline configuration.
 
-The model is trained purely on match results and international ratings -- no betting
-odds. Two free, public-domain (CC0) GitHub sources:
-  1. FIFA-World-Cup-2026-Dataset (updated daily) -- relational current-tournament
+The model is trained purely on match results -- no betting odds. Free, public-domain
+data sources:
+  1. FIFA-World-Cup-2026-Dataset (CC0, updated daily) -- relational current-tournament
      stats, mirrored into data/raw/wc2026/ (see wc_fetch.py).
-  2. martj42/international_results (1872-present) -- all international matches, used
-     for the rolling-Elo strength and the history-fit coefficients (see wc_intl_elo.py),
-     mirrored into data/raw/intl/.
+  2. martj42/international_results (CC0, 1872-present) -- all international matches, the
+     per-team Dixon-Coles training pool (see wc_train.py), mirrored into data/raw/intl/.
+  3. jfjelstul/worldcup (CC-BY-SA 4.0) -- Fjelstul WC DB, for the knockout-conversion
+     calibration (see wc_knockout.py), mirrored into data/raw/fjelstul/.
 """
 from __future__ import annotations
 

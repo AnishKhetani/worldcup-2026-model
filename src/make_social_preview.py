@@ -52,7 +52,7 @@ ax.text(90, 500, "FIFA WORLD CUP 2026", color=ACCENT, fontsize=21,
 ax.text(88, 430, "Model Predictions", color=INK, fontsize=76,
         fontweight="bold", family="DejaVu Sans")
 # subtitle
-ax.text(90, 335, "Dixon-Coles Poisson goal model  ·  international Elo ratings",
+ax.text(90, 335, "Per-team Dixon-Coles Poisson goal model",
         color=INK, fontsize=27, family="DejaVu Sans")
 ax.text(90, 288, "Live, auto-updating public track record  ·  no betting odds",
         color=MUTED, fontsize=23, family="DejaVu Sans")

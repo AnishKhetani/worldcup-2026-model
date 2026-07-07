@@ -20,6 +20,14 @@ from wc_config import PROCESSED_DIR
 
 SITE_DIR = Path(__file__).resolve().parents[1] / "site"
 REPO_URL = "https://github.com/AnishKhetani/worldcup-2026-model"
+SITE_URL = "https://anishkhetani.github.io/worldcup-2026-model/"
+
+PAGE_TITLE = "World Cup 2026 Predictions — Dixon-Coles Poisson &amp; Elo Model"
+META_DESCRIPTION = (
+    "Live, auto-updating World Cup 2026 knockout predictions from a Dixon-Coles "
+    "Poisson goal model with international Elo ratings (1872-present). Public, "
+    "walk-forward-validated track record — no betting odds, no lookahead."
+)
 
 CSS = """
 :root{--bg:#f7f8fa;--card:#fff;--ink:#111418;--muted:#5a6472;--line:#e4e7ec;
@@ -139,12 +147,29 @@ def render(df: pd.DataFrame, tr: dict, updated: str) -> str:
         record = '<div class="card">No completed matches scored yet.</div>'
 
     css = "<style>" + CSS + "</style>"
+    head_meta = f"""<title>{PAGE_TITLE}</title>
+<meta name="description" content="{META_DESCRIPTION}">
+<link rel="canonical" href="{SITE_URL}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="World Cup 2026 Model">
+<meta property="og:title" content="{PAGE_TITLE}">
+<meta property="og:description" content="{META_DESCRIPTION}">
+<meta property="og:url" content="{SITE_URL}">
+<meta property="og:image" content="{SITE_URL}social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{PAGE_TITLE}">
+<meta name="twitter:description" content="{META_DESCRIPTION}">
+<meta name="twitter:image" content="{SITE_URL}social-preview.png">"""
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>World Cup 2026 — Model Predictions</title>{css}</head><body><div class="wrap">
+{head_meta}
+{css}</head><body><div class="wrap">
 <h1>World Cup 2026 — Model Predictions</h1>
-<p class="sub">A statistical model's result predictions for the remaining knockout
-fixtures, and its running track record on matches already played.</p>
+<p class="sub">A Dixon-Coles Poisson goal model with international Elo ratings predicts
+the remaining World Cup 2026 knockout fixtures, and this page tracks the live record
+of those predictions against actual results.</p>
 <div class="disc"><b>Research / analytics project — not betting advice.</b> These are
 model probabilities published for interest and to keep the model honest against real
 results. No wagering guidance is given or implied.</div>

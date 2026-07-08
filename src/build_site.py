@@ -30,6 +30,65 @@ META_DESCRIPTION = (
     "no lookahead."
 )
 
+# Minimal inline favicon (soccer ball emoji) — no binary asset to keep in sync.
+FAVICON = (
+    '<link rel="icon" href="data:image/svg+xml,'
+    '<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22>'
+    '<text y=%22.9em%22 font-size=%2290%22>%E2%9A%BD</text></svg>">'
+)
+
+ROBOTS_TXT = f"""User-agent: *
+Allow: /
+
+Sitemap: {SITE_URL}sitemap.xml
+"""
+
+
+def _sitemap_xml(lastmod: str) -> str:
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>{SITE_URL}</loc>
+<lastmod>{lastmod}</lastmod>
+<changefreq>daily</changefreq>
+<priority>1.0</priority>
+</url>
+</urlset>
+"""
+
+
+def _json_ld() -> str:
+    import json
+
+    data = {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": "World Cup 2026 Model Predictions & Track Record",
+        "description": META_DESCRIPTION,
+        "url": SITE_URL,
+        "sameAs": REPO_URL,
+        "creator": {
+            "@type": "Person",
+            "name": "Anish Khetani",
+            "url": "https://github.com/AnishKhetani",
+        },
+        "distribution": {
+            "@type": "DataDownload",
+            "encodingFormat": "text/csv",
+            "contentUrl": SITE_URL + "results_log.csv",
+        },
+        "isBasedOn": [
+            "https://github.com/mominullptr/FIFA-World-Cup-2026-Dataset",
+            "https://github.com/martj42/international_results",
+            "https://github.com/jfjelstul/worldcup",
+        ],
+        "keywords": [
+            "World Cup 2026", "Dixon-Coles model", "Poisson goal model",
+            "football prediction", "soccer analytics", "sports forecasting",
+        ],
+    }
+    return f'<script type="application/ld+json">{json.dumps(data)}</script>'
+
 CSS = """
 :root{--bg:#f7f8fa;--card:#fff;--ink:#111418;--muted:#5a6472;--line:#e4e7ec;
 --home:#2563eb;--draw:#94a3b8;--away:#e2683c;--ok:#16a34a;--no:#dc2626;--accent:#2563eb}
@@ -114,12 +173,20 @@ def _record_rows(done: pd.DataFrame) -> str:
     out = []
     for _, r in done.sort_values(["date", "match_id"], ascending=[False, False]).iterrows():
         home, away = html.escape(r["home_team"]), html.escape(r["away_team"])
-        pick_team = home if r["pick"] == "H" else (away if r["pick"] == "A" else "Draw")
-        act_team = home if r["actual"] == "H" else (away if r["actual"] == "A" else "Draw")
+        adv = str(r.get("advanced", "") or "")
+        if bool(r["is_knockout"]) and adv:
+            # Knockout tie: show the progression call vs who actually advanced.
+            pick_team = html.escape(str(r["progress_pick"]))
+            conf = r["progress_conf"]
+            act_team = f"{html.escape(adv)} <span style='color:var(--muted)'>advanced</span>"
+        else:
+            pick_team = home if r["pick"] == "H" else (away if r["pick"] == "A" else "Draw")
+            conf = r["pick_conf"]
+            act_team = home if r["actual"] == "H" else (away if r["actual"] == "A" else "Draw")
         mark = '<span class="ok">&#10003;</span>' if r["correct"] else '<span class="no">&#10007;</span>'
         out.append(
             f"<tr><td>{r['date']}</td><td>{html.escape(str(r['stage']))}</td>"
-            f"<td>{home} v {away}</td><td>{pick_team} ({_pct(r['pick_conf'])})</td>"
+            f"<td>{home} v {away}</td><td>{pick_team} ({_pct(conf)})</td>"
             f"<td>{act_team} <span style='color:var(--muted)'>{html.escape(str(r['actual_score']))}</span></td>"
             f"<td class='c'>{mark}</td></tr>")
     return "".join(out)
@@ -128,6 +195,11 @@ def _record_rows(done: pd.DataFrame) -> str:
 def render(df: pd.DataFrame, tr: dict, updated: str) -> str:
     upcoming = df[df["completed"] == False]  # noqa: E712
     done = df[df["completed"] == True]       # noqa: E712
+
+    # Latest actual result in the data — shown in the footer so a frozen/stale deploy is
+    # visible (this date stops advancing while the "Updated" stamp keeps moving).
+    latest_result = (str(pd.to_datetime(done["date"]).max().date())
+                     if len(done) else "—")
 
     up_html = ("".join(_upcoming_card(r) for _, r in upcoming.iterrows())
                if len(upcoming) else
@@ -151,6 +223,7 @@ def render(df: pd.DataFrame, tr: dict, updated: str) -> str:
     head_meta = f"""<title>{PAGE_TITLE}</title>
 <meta name="description" content="{META_DESCRIPTION}">
 <link rel="canonical" href="{SITE_URL}">
+{FAVICON}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="World Cup 2026 Model">
 <meta property="og:title" content="{PAGE_TITLE}">
@@ -162,7 +235,8 @@ def render(df: pd.DataFrame, tr: dict, updated: str) -> str:
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{PAGE_TITLE}">
 <meta name="twitter:description" content="{META_DESCRIPTION}">
-<meta name="twitter:image" content="{SITE_URL}social-preview.png">"""
+<meta name="twitter:image" content="{SITE_URL}social-preview.png">
+{_json_ld()}"""
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 {head_meta}
@@ -180,8 +254,9 @@ results. No wagering guidance is given or implied.</div>
 
 <h2>Track record</h2>
 <p class="sub">How the model's pre-match pick has fared on the {tr.get('n', 0)} matches
-played so far. "Log loss" rewards being confident <i>and</i> right; the base-rate line
-is a naive predictor for comparison.</p>
+played so far. Knockout ties are scored on which team <i>advanced</i> (extra time /
+penalties); "log loss" and the Brier score reward being confident <i>and</i> right on
+the 90-minute result, with the base-rate line a naive predictor for comparison.</p>
 {record}
 
 <h2>How it works</h2>
@@ -195,7 +270,7 @@ walk-forward from only earlier games, so there is no lookahead. Full method:
 <a href="{REPO_URL}/blob/main/SPEC.md">SPEC.md</a>.</p>
 
 <div class="foot">
-Updated {updated} UTC · Data: <a href="https://github.com/mominullptr/FIFA-World-Cup-2026-Dataset">FIFA World Cup 2026 Dataset</a>
+Updated {updated} UTC · Latest result in data: {latest_result} · Data: <a href="https://github.com/mominullptr/FIFA-World-Cup-2026-Dataset">FIFA World Cup 2026 Dataset</a>
 (CC0) &amp; <a href="https://github.com/martj42/international_results">international_results</a> (CC0).
 · <a href="{REPO_URL}">Source &amp; method</a> · <a href="results_log.csv">predictions CSV</a><br>
 Public research project. Not affiliated with FIFA. Not betting advice.
@@ -210,6 +285,8 @@ def main() -> int:
     SITE_DIR.mkdir(exist_ok=True)
     (SITE_DIR / "index.html").write_text(render(df, tr, updated), encoding="utf-8")
     shutil.copy(PROCESSED_DIR / "results_log.csv", SITE_DIR / "results_log.csv")
+    (SITE_DIR / "sitemap.xml").write_text(_sitemap_xml(updated.split(" ")[0]), encoding="utf-8")
+    (SITE_DIR / "robots.txt").write_text(ROBOTS_TXT, encoding="utf-8")
     print(f"Built {SITE_DIR/'index.html'} "
           f"({int((df['completed']==False).sum())} upcoming, {tr.get('n',0)} scored).")
     return 0

@@ -65,7 +65,13 @@ def download(force: bool = False) -> None:
     INTL_DIR.mkdir(parents=True, exist_ok=True)
     r = requests.get(RESULTS_URL, headers=HTTP_HEADERS, timeout=HTTP_TIMEOUT)
     r.raise_for_status()
-    RESULTS_CSV.write_bytes(r.content)
+    body = r.content
+    # Don't let a truncated download shrink the training pool over good committed data.
+    if RESULTS_CSV.exists() and len(body) < 0.5 * RESULTS_CSV.stat().st_size:
+        print(f"  results.csv kept: new {len(body):,}B < 50% of existing "
+              f"{RESULTS_CSV.stat().st_size:,}B — suspected truncation")
+        return
+    RESULTS_CSV.write_bytes(body)
 
 
 def tournament_tier(tournament: str, year: int,

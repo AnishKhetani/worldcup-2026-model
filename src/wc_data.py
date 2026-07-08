@@ -24,10 +24,16 @@ import re
 import numpy as np
 import pandas as pd
 
-from wc_config import WC_RAW_DIR
+from wc_config import WC_COMPLETED_STATUSES, WC_RAW_DIR
 
 HOST_NATIONS = {"USA", "United States", "Canada", "Mexico"}
-_COMPLETED = "Completed"
+
+
+def _completed_mask(status: pd.Series) -> pd.Series:
+    """Boolean mask of played matches, tolerant of upstream status casing/spelling
+    (see WC_COMPLETED_STATUSES). A brittle exact-string match here would silently zero
+    the entire track record if the upstream ever relabelled 'Completed'."""
+    return status.astype(str).str.strip().str.lower().isin(WC_COMPLETED_STATUSES)
 
 
 def _csv(name: str) -> pd.DataFrame:
@@ -61,7 +67,13 @@ def _regulation_scores() -> dict[int, tuple[int, int]]:
     matches = _csv("matches.csv")
     ev = _csv("match_events.csv")
     ev = ev[ev["event_type"] == "Goal"].copy()
-    ev["bm"] = ev["minute"].apply(_base_minute)
+    # Coerce to numeric so an unparseable minute becomes NaN (excluded) rather than
+    # silently poisoning the comparison; warn so it doesn't pass unnoticed.
+    ev["bm"] = pd.to_numeric(ev["minute"].apply(_base_minute), errors="coerce")
+    unparsed = int(ev["bm"].isna().sum())
+    if unparsed:
+        print(f"  [warn] {unparsed} Goal event(s) with unparseable minute — "
+              f"excluded from 90' reconstruction")
     reg = ev[ev["bm"] <= 90]
     out: dict[int, tuple[int, int]] = {}
     et_ids = matches.loc[matches["result_type"].isin(["AET", "Penalties"]), "match_id"]
@@ -76,6 +88,20 @@ def _regulation_scores() -> dict[int, tuple[int, int]]:
 
 def _result(hg: float, ag: float) -> str:
     return "H" if hg > ag else ("A" if hg < ag else "D")
+
+
+def _advanced(row) -> str:
+    """Which side actually advanced from a completed knockout tie: 'H', 'A', or ''.
+    Penalties are decided by the shootout score; AET/regulation ties by the final score
+    (which for AET already reflects extra time). Used to score the model's progression
+    call, so a shootout win isn't counted as a miss just because 90' was level."""
+    if str(row.get("result_type", "")).strip().lower() == "penalties":
+        h, a = row.get("home_penalty_score"), row.get("away_penalty_score")
+    else:
+        h, a = row.get("home_score"), row.get("away_score")
+    if pd.isna(h) or pd.isna(a):
+        return ""
+    return "H" if h > a else ("A" if a > h else "")
 
 
 def _assemble() -> pd.DataFrame:
@@ -119,20 +145,21 @@ def _assemble() -> pd.DataFrame:
 def load_played_matches() -> pd.DataFrame:
     """Completed matches with both teams and a 90' score, chronologically ordered."""
     m = _assemble()
-    m = m[(m["status"] == _COMPLETED)
+    m = m[_completed_mask(m["status"])
           & m["home_strength"].notna() & m["away_strength"].notna()].copy()
     m["result90"] = [_result(h, a) for h, a in zip(m["hg90"], m["ag90"])]
     m["was_et"] = m["result_type"].isin(["AET", "Penalties"])
+    m["advanced"] = m.apply(lambda r: _advanced(r) if r["is_knockout"] else "", axis=1)
     cols = ["match_id", "date", "stage", "is_knockout", "home_team", "away_team",
             "home_team_id", "away_team_id", "home_strength", "away_strength",
-            "hg90", "ag90", "result90", "was_et"]
+            "hg90", "ag90", "result90", "was_et", "advanced"]
     return m[cols].reset_index(drop=True)
 
 
 def load_remaining_fixtures() -> pd.DataFrame:
     """Scheduled knockout matches whose two teams are already known (bracket filled)."""
     m = _assemble()
-    m = m[(m["status"] != _COMPLETED)
+    m = m[~_completed_mask(m["status"])
           & m["home_strength"].notna() & m["away_strength"].notna()].copy()
     cols = ["match_id", "date", "stage", "home_team", "away_team",
             "home_team_id", "away_team_id", "home_strength", "away_strength",
@@ -143,5 +170,5 @@ def load_remaining_fixtures() -> pd.DataFrame:
 def count_pending_tbd() -> int:
     """Scheduled matches whose teams are not yet determined (await earlier results)."""
     m = _assemble()
-    return int(((m["status"] != _COMPLETED)
+    return int((~_completed_mask(m["status"])
                 & (m["home_strength"].isna() | m["away_strength"].isna())).sum())

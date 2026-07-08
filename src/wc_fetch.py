@@ -45,6 +45,13 @@ def fetch_wc_csvs(force: bool = False) -> int:
         if body is None or len(body) < 10 or b"," not in body[:2000]:
             print(f"  {fname:<26} MISSING/empty")
             continue
+        # Guard against a truncated download clobbering good committed data: if the new
+        # body is under half the existing file, keep the old copy rather than shrink it.
+        if dest.exists() and len(body) < 0.5 * dest.stat().st_size:
+            print(f"  {fname:<26} kept ({len(body):,}B < 50% of existing "
+                  f"{dest.stat().st_size:,}B — suspected truncation)")
+            got += 1
+            continue
         dest.write_bytes(body)
         print(f"  {fname:<26} ok ({len(body):,} bytes)")
         got += 1

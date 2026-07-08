@@ -67,7 +67,13 @@ def download_fjelstul(force: bool = False) -> None:
     FJELSTUL_DIR.mkdir(parents=True, exist_ok=True)
     r = requests.get(FJELSTUL_URL, headers=HTTP_HEADERS, timeout=HTTP_TIMEOUT)
     r.raise_for_status()
-    FJELSTUL_CSV.write_bytes(r.content)
+    body = r.content
+    # Don't let a truncated download clobber good committed calibration data.
+    if FJELSTUL_CSV.exists() and len(body) < 0.5 * FJELSTUL_CSV.stat().st_size:
+        print(f"  matches.csv kept: new {len(body):,}B < 50% of existing "
+              f"{FJELSTUL_CSV.stat().st_size:,}B — suspected truncation")
+        return
+    FJELSTUL_CSV.write_bytes(body)
 
 
 # --- runtime conversion (pure, pinned) --------------------------------------

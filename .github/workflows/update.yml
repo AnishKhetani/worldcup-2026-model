@@ -44,6 +44,13 @@ jobs:
         working-directory: src
         run: python wc_fetch.py --force || true
 
+      # Hard gate: block the deploy if the data violates a core invariant (missing file,
+      # duplicate match_id, completed-but-scoreless match) rather than shipping a broken
+      # or empty site. A failure here leaves the last good deploy in place.
+      - name: Validate data
+        working-directory: src
+        run: python wc_validate.py
+
       - name: Build predictions + site
         working-directory: src
         run: python build_site.py

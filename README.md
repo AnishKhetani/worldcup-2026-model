@@ -57,9 +57,9 @@ results land — see the live site for the current figure and the full match-by-
 
 ## Automation
 
-[`.github/workflows/update.yml`](.github/workflows/update.yml) runs every 3 hours (and on
-demand): re-pull the data, rebuild the predictions and site, and deploy to GitHub Pages —
-so the live site is always current before the next matchday.
+[`.github/workflows/update.yml`](.github/workflows/update.yml) runs once daily at 07:00
+UTC (and on demand): re-pull the data, validate it, rebuild the predictions and site, and
+deploy to GitHub Pages — so the live site refreshes after each matchday's results land.
 
 ## Run locally
 

@@ -48,6 +48,7 @@ def _row(mt, o, is_ko, m):
         "p_home": round(p_h, 4), "p_draw": round(p_d, 4), "p_away": round(p_a, 4),
         "pick": pick, "pick_conf": round(max(p_h, p_d, p_a), 4),
         "home_progress": "", "away_progress": "", "progress_pick": "", "progress_conf": "",
+        "advanced": "",
     }
     if is_ko:
         adv = p_advance(p_h, p_d, p_a)
@@ -76,7 +77,16 @@ def build_log() -> pd.DataFrame:
             row["completed"] = True
             row["actual"] = mt["result90"]
             row["actual_score"] = f"{int(mt['hg90'])}-{int(mt['ag90'])}"
-            row["correct"] = bool(pick == mt["result90"])
+            # Knockout ties are scored on the model's progression call vs who actually
+            # advanced (extra time / penalties), not the 90' H/D/A -- otherwise every
+            # shootout the model called correctly would still read as a miss. Group
+            # matches (and any knockout with an unknown advancer) score on the 90' result.
+            if mt["is_knockout"] and mt["advanced"] in ("H", "A") and row["progress_pick"]:
+                adv_team = mt["home_team"] if mt["advanced"] == "H" else mt["away_team"]
+                row["advanced"] = adv_team
+                row["correct"] = bool(row["progress_pick"] == adv_team)
+            else:
+                row["correct"] = bool(pick == mt["result90"])
             rows.append(row)
 
     # --- upcoming: model fit on everything available now ---

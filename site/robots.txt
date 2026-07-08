@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anishkhetani.github.io/worldcup-2026-model/sitemap.xml

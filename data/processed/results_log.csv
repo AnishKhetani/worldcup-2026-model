@@ -1,99 +1,99 @@
-match_id,date,kickoff_utc,stage,is_knockout,home_team,away_team,p_home,p_draw,p_away,pick,pick_conf,home_progress,away_progress,progress_pick,progress_conf,completed,actual,actual_score,correct
-95,2026-07-07,16:00,Round of 16,True,Argentina,Egypt,0.6378,0.245,0.1172,H,0.6378,0.8068,0.1932,Argentina,0.8068,False,,,
-96,2026-07-07,20:00,Round of 16,True,Switzerland,Colombia,0.2808,0.29,0.4292,A,0.4292,0.4113,0.5887,Colombia,0.5887,False,,,
-97,2026-07-09,20:00,Quarter-finals,True,France,Morocco,0.4183,0.322,0.2597,H,0.4183,0.5974,0.4026,France,0.5974,False,,,
-99,2026-07-11,21:00,Quarter-finals,True,Norway,England,0.2562,0.2274,0.5164,A,0.5164,0.3513,0.6487,England,0.6487,False,,,
-1,2026-06-11,19:00,Group Stage,False,Mexico,South Africa,0.639,0.2444,0.1166,H,0.639,,,,,True,H,2-0,True
-2,2026-06-11,23:00,Group Stage,False,South Korea,Czechia,0.4924,0.2486,0.259,H,0.4924,,,,,True,H,2-1,True
-3,2026-06-12,19:00,Group Stage,False,Canada,Bosnia and Herzegovina,0.7444,0.1726,0.0831,H,0.7444,,,,,True,D,1-1,False
-4,2026-06-12,23:00,Group Stage,False,USA,Paraguay,0.4589,0.2858,0.2553,H,0.4589,,,,,True,H,4-1,True
-5,2026-06-13,15:00,Group Stage,False,Qatar,Switzerland,0.1364,0.1819,0.6817,A,0.6817,,,,,True,D,1-1,False
-6,2026-06-13,18:00,Group Stage,False,Brazil,Morocco,0.3841,0.3222,0.2937,H,0.3841,,,,,True,D,1-1,False
-7,2026-06-13,21:00,Group Stage,False,Haiti,Scotland,0.2867,0.2469,0.4664,A,0.4664,,,,,True,A,0-1,True
-8,2026-06-13,23:59,Group Stage,False,Australia,Türkiye,0.497,0.2537,0.2492,H,0.497,,,,,True,H,2-0,True
-9,2026-06-14,15:00,Group Stage,False,Germany,Curaçao,0.8157,0.1215,0.0627,H,0.8157,,,,,True,H,7-1,True
-10,2026-06-14,18:00,Group Stage,False,Netherlands,Japan,0.3644,0.2544,0.3812,A,0.3812,,,,,True,D,2-2,False
-11,2026-06-14,21:00,Group Stage,False,Côte d'Ivoire,Ecuador,0.2383,0.3369,0.4248,A,0.4248,,,,,True,H,1-0,False
-12,2026-06-14,23:59,Group Stage,False,Sweden,Tunisia,0.3583,0.2786,0.3631,A,0.3631,,,,,True,H,5-1,False
-13,2026-06-15,15:00,Group Stage,False,Spain,Cabo Verde,0.8534,0.1076,0.039,H,0.8534,,,,,True,D,0-0,False
-14,2026-06-15,18:00,Group Stage,False,Belgium,Egypt,0.5251,0.2748,0.2001,H,0.5251,,,,,True,D,1-1,False
-15,2026-06-15,21:00,Group Stage,False,Saudi Arabia,Uruguay,0.1614,0.3027,0.5359,A,0.5359,,,,,True,D,1-1,False
-16,2026-06-15,23:59,Group Stage,False,IR Iran,New Zealand,0.5201,0.253,0.2269,H,0.5201,,,,,True,D,2-2,False
-17,2026-06-16,15:00,Group Stage,False,France,Senegal,0.4821,0.2813,0.2365,H,0.4821,,,,,True,H,3-1,True
-18,2026-06-16,18:00,Group Stage,False,Iraq,Norway,0.2001,0.2454,0.5544,A,0.5544,,,,,True,A,1-4,True
-19,2026-06-16,21:00,Group Stage,False,Argentina,Algeria,0.6302,0.2353,0.1345,H,0.6302,,,,,True,H,3-0,True
-20,2026-06-16,23:59,Group Stage,False,Austria,Jordan,0.482,0.2571,0.2609,H,0.482,,,,,True,H,3-1,True
-21,2026-06-17,15:00,Group Stage,False,Portugal,Congo DR,0.6177,0.2467,0.1356,H,0.6177,,,,,True,D,1-1,False
-22,2026-06-17,18:00,Group Stage,False,England,Croatia,0.5391,0.2647,0.1962,H,0.5391,,,,,True,H,4-2,True
-23,2026-06-17,21:00,Group Stage,False,Ghana,Panama,0.3294,0.267,0.4036,A,0.4036,,,,,True,H,1-0,False
-24,2026-06-17,23:59,Group Stage,False,Uzbekistan,Colombia,0.1959,0.2838,0.5203,A,0.5203,,,,,True,A,1-3,True
-25,2026-06-18,15:00,Group Stage,False,Mexico,South Korea,0.5179,0.2858,0.1963,H,0.5179,,,,,True,H,1-0,True
-26,2026-06-18,18:00,Group Stage,False,Czechia,South Africa,0.4547,0.2703,0.2749,H,0.4547,,,,,True,D,1-1,False
-27,2026-06-18,21:00,Group Stage,False,Canada,Qatar,0.6796,0.1999,0.1205,H,0.6796,,,,,True,H,6-0,True
-28,2026-06-18,23:59,Group Stage,False,Switzerland,Bosnia and Herzegovina,0.6757,0.2005,0.1238,H,0.6757,,,,,True,H,4-1,True
-29,2026-06-19,15:00,Group Stage,False,Brazil,Haiti,0.801,0.1354,0.0636,H,0.801,,,,,True,H,3-0,True
-30,2026-06-19,18:00,Group Stage,False,Scotland,Morocco,0.1741,0.2908,0.5351,A,0.5351,,,,,True,A,0-1,True
-31,2026-06-19,21:00,Group Stage,False,USA,Australia,0.3537,0.2922,0.354,A,0.354,,,,,True,H,2-0,False
-32,2026-06-19,23:59,Group Stage,False,Türkiye,Paraguay,0.4279,0.2634,0.3087,H,0.4279,,,,,True,A,0-1,False
-33,2026-06-20,15:00,Group Stage,False,Germany,Côte d'Ivoire,0.5847,0.2262,0.1891,H,0.5847,,,,,True,H,2-1,True
-34,2026-06-20,18:00,Group Stage,False,Ecuador,Curaçao,0.7404,0.1844,0.0753,H,0.7404,,,,,True,D,0-0,False
-35,2026-06-20,21:00,Group Stage,False,Netherlands,Sweden,0.5865,0.1977,0.2158,H,0.5865,,,,,True,H,5-1,True
-36,2026-06-20,23:59,Group Stage,False,Tunisia,Japan,0.1573,0.2242,0.6185,A,0.6185,,,,,True,A,0-4,True
-37,2026-06-21,15:00,Group Stage,False,Belgium,IR Iran,0.497,0.2528,0.2502,H,0.497,,,,,True,D,0-0,False
-38,2026-06-21,18:00,Group Stage,False,New Zealand,Egypt,0.3308,0.2998,0.3694,A,0.3694,,,,,True,A,1-3,True
-39,2026-06-21,21:00,Group Stage,False,Spain,Saudi Arabia,0.7516,0.1766,0.0718,H,0.7516,,,,,True,H,4-0,True
-40,2026-06-21,23:59,Group Stage,False,Uruguay,Cabo Verde,0.5881,0.2839,0.128,H,0.5881,,,,,True,D,2-2,False
-41,2026-06-22,15:00,Group Stage,False,France,Iraq,0.7617,0.1642,0.0741,H,0.7617,,,,,True,H,3-0,True
-42,2026-06-22,18:00,Group Stage,False,Norway,Senegal,0.4574,0.2484,0.2942,H,0.4574,,,,,True,H,3-2,True
-43,2026-06-22,21:00,Group Stage,False,Argentina,Austria,0.6681,0.2193,0.1125,H,0.6681,,,,,True,H,2-0,True
-44,2026-06-22,23:59,Group Stage,False,Jordan,Algeria,0.2697,0.2475,0.4828,A,0.4828,,,,,True,A,1-2,True
-45,2026-06-23,15:00,Group Stage,False,Portugal,Uzbekistan,0.6363,0.2228,0.1409,H,0.6363,,,,,True,H,5-0,True
-46,2026-06-23,18:00,Group Stage,False,Colombia,Congo DR,0.5896,0.2656,0.1448,H,0.5896,,,,,True,H,1-0,True
-47,2026-06-23,21:00,Group Stage,False,England,Ghana,0.7291,0.1845,0.0864,H,0.7291,,,,,True,D,0-0,False
-48,2026-06-23,23:59,Group Stage,False,Panama,Croatia,0.2341,0.2358,0.5301,A,0.5301,,,,,True,A,0-1,True
-49,2026-06-24,18:00,Group Stage,False,Czechia,Mexico,0.2623,0.3124,0.4253,A,0.4253,,,,,True,A,0-3,True
-50,2026-06-24,18:00,Group Stage,False,South Africa,South Korea,0.2362,0.273,0.4908,A,0.4908,,,,,True,H,1-0,False
-51,2026-06-24,22:00,Group Stage,False,Switzerland,Canada,0.504,0.2602,0.2359,H,0.504,,,,,True,H,2-1,True
-52,2026-06-24,22:00,Group Stage,False,Bosnia and Herzegovina,Qatar,0.4432,0.2476,0.3092,H,0.4432,,,,,True,H,3-1,True
-53,2026-06-25,18:00,Group Stage,False,Scotland,Brazil,0.1083,0.2076,0.6841,A,0.6841,,,,,True,A,0-3,True
-54,2026-06-25,18:00,Group Stage,False,Morocco,Haiti,0.7589,0.1653,0.0758,H,0.7589,,,,,True,H,4-2,True
-55,2026-06-25,22:00,Group Stage,False,Türkiye,USA,0.403,0.2593,0.3377,H,0.403,,,,,True,H,3-2,True
-56,2026-06-25,22:00,Group Stage,False,Paraguay,Australia,0.2669,0.3102,0.4229,A,0.4229,,,,,True,D,0-0,False
-57,2026-06-26,18:00,Group Stage,False,Ecuador,Germany,0.2922,0.2923,0.4155,A,0.4155,,,,,True,H,2-1,False
-58,2026-06-26,18:00,Group Stage,False,Curaçao,Côte d'Ivoire,0.1204,0.225,0.6546,A,0.6546,,,,,True,A,0-2,True
-59,2026-06-26,22:00,Group Stage,False,Tunisia,Netherlands,0.1033,0.1635,0.7331,A,0.7331,,,,,True,A,1-3,True
-60,2026-06-26,22:00,Group Stage,False,Japan,Sweden,0.6243,0.1983,0.1774,H,0.6243,,,,,True,D,1-1,False
-65,2026-06-26,18:00,Group Stage,False,Norway,France,0.257,0.2286,0.5144,A,0.5144,,,,,True,A,1-4,True
-66,2026-06-26,18:00,Group Stage,False,Senegal,Iraq,0.6196,0.2336,0.1468,H,0.6196,,,,,True,H,5-0,True
-61,2026-06-27,18:00,Group Stage,False,New Zealand,Belgium,0.1038,0.1545,0.7417,A,0.7417,,,,,True,A,1-5,True
-62,2026-06-27,18:00,Group Stage,False,Egypt,IR Iran,0.3428,0.323,0.3341,H,0.3428,,,,,True,D,1-1,False
-63,2026-06-27,22:00,Group Stage,False,Uruguay,Spain,0.1781,0.2741,0.5477,A,0.5477,,,,,True,A,0-1,True
-64,2026-06-27,22:00,Group Stage,False,Cabo Verde,Saudi Arabia,0.3754,0.3517,0.273,H,0.3754,,,,,True,D,0-0,False
-67,2026-06-27,22:00,Group Stage,False,Jordan,Argentina,0.0463,0.1297,0.824,A,0.824,,,,,True,A,1-3,True
-68,2026-06-27,22:00,Group Stage,False,Algeria,Austria,0.3585,0.2717,0.3698,A,0.3698,,,,,True,D,3-3,False
-69,2026-06-28,18:00,Group Stage,False,Colombia,Portugal,0.3529,0.2927,0.3544,A,0.3544,,,,,True,D,0-0,False
-70,2026-06-28,18:00,Group Stage,False,Congo DR,Uzbekistan,0.5196,0.29,0.1903,H,0.5196,,,,,True,H,3-1,True
-71,2026-06-28,22:00,Group Stage,False,Panama,England,0.0991,0.1998,0.7011,A,0.7011,,,,,True,A,0-2,True
-72,2026-06-28,22:00,Group Stage,False,Croatia,Ghana,0.5429,0.2607,0.1964,H,0.5429,,,,,True,H,2-1,True
-73,2026-06-29,12:00,Round of 32,True,South Africa,Canada,0.2234,0.2909,0.4857,A,0.4857,0.3425,0.6575,Canada,0.6575,True,A,0-1,True
-74,2026-06-29,23:00,Round of 32,True,Brazil,Japan,0.5021,0.2648,0.2331,H,0.5021,0.6582,0.3418,Brazil,0.6582,True,H,2-1,True
-75,2026-06-30,02:30,Round of 32,True,Germany,Paraguay,0.5864,0.231,0.1826,H,0.5864,0.7329,0.2671,Germany,0.7329,True,D,1-1,False
-76,2026-06-30,07:00,Round of 32,True,Netherlands,Morocco,0.3541,0.2905,0.3554,A,0.3554,0.4992,0.5008,Morocco,0.5008,True,D,1-1,False
-77,2026-06-30,23:00,Round of 32,True,Côte d'Ivoire,Norway,0.3392,0.2599,0.4009,A,0.4009,0.464,0.536,Norway,0.536,True,A,1-2,True
-78,2026-07-01,03:00,Round of 32,True,France,Sweden,0.759,0.1499,0.0912,H,0.759,0.8685,0.1315,France,0.8685,True,H,3-0,True
-79,2026-07-01,07:00,Round of 32,True,Mexico,Ecuador,0.4632,0.3675,0.1693,H,0.4632,0.6898,0.3102,Mexico,0.6898,True,H,2-0,True
-80,2026-07-01,22:00,Round of 32,True,England,Congo DR,0.5719,0.2885,0.1396,H,0.5719,0.7624,0.2376,England,0.7624,True,H,2-1,True
-81,2026-07-02,02:00,Round of 32,True,Belgium,Senegal,0.4924,0.2485,0.2591,H,0.4924,0.6353,0.3647,Belgium,0.6353,True,D,2-2,False
-82,2026-07-02,06:00,Round of 32,True,USA,Bosnia and Herzegovina,0.7189,0.1766,0.1045,H,0.7189,0.8449,0.1551,USA,0.8449,True,H,2-0,True
-83,2026-07-03,01:00,Round of 32,True,Spain,Austria,0.7478,0.1662,0.086,H,0.7478,0.87,0.13,Spain,0.87,True,H,3-0,True
-84,2026-07-03,05:00,Round of 32,True,Portugal,Croatia,0.5847,0.2296,0.1857,H,0.5847,0.7298,0.2702,Portugal,0.7298,True,H,2-1,True
-85,2026-07-03,09:00,Round of 32,True,Switzerland,Algeria,0.5458,0.2352,0.2191,H,0.5458,0.6883,0.3117,Switzerland,0.6883,True,H,2-0,True
-86,2026-07-04,00:00,Round of 32,True,Australia,Egypt,0.3909,0.3425,0.2666,H,0.3909,0.5776,0.4224,Australia,0.5776,True,D,1-1,False
-87,2026-07-04,04:00,Round of 32,True,Argentina,Cabo Verde,0.7689,0.1694,0.0617,H,0.7689,0.8988,0.1012,Argentina,0.8988,True,D,1-1,False
-88,2026-07-04,07:30,Round of 32,True,Colombia,Ghana,0.6428,0.2479,0.1093,H,0.6428,0.8157,0.1843,Colombia,0.8157,True,H,1-0,True
-89,2026-07-04,21:00,Round of 16,True,Paraguay,France,0.1342,0.2519,0.614,A,0.614,0.2168,0.7832,France,0.7832,True,A,0-1,True
-90,2026-07-04,23:00,Round of 16,True,Canada,Morocco,0.2376,0.3101,0.4522,A,0.4522,0.3693,0.6307,Morocco,0.6307,True,A,0-3,True
-91,2026-07-05,20:00,Round of 16,True,Brazil,Norway,0.6428,0.1929,0.1643,H,0.6428,0.7692,0.2308,Brazil,0.7692,True,A,1-2,False
-92,2026-07-06,01:00,Round of 16,True,Mexico,England,0.3262,0.3161,0.3577,A,0.3577,0.4808,0.5192,England,0.5192,True,A,2-3,True
-93,2026-07-06,19:00,Round of 16,True,Portugal,Spain,0.2686,0.2781,0.4533,A,0.4533,0.3906,0.6094,Spain,0.6094,True,A,0-1,True
-94,2026-07-07,00:00,Round of 16,True,USA,Belgium,0.2666,0.2397,0.4937,A,0.4937,0.3692,0.6308,Belgium,0.6308,True,A,1-4,True
+match_id,date,kickoff_utc,stage,is_knockout,home_team,away_team,p_home,p_draw,p_away,pick,pick_conf,home_progress,away_progress,progress_pick,progress_conf,advanced,completed,actual,actual_score,correct
+95,2026-07-07,16:00,Round of 16,True,Argentina,Egypt,0.6378,0.245,0.1172,H,0.6378,0.8068,0.1932,Argentina,0.8068,,False,,,
+96,2026-07-07,20:00,Round of 16,True,Switzerland,Colombia,0.2808,0.29,0.4292,A,0.4292,0.4113,0.5887,Colombia,0.5887,,False,,,
+97,2026-07-09,20:00,Quarter-finals,True,France,Morocco,0.4183,0.322,0.2597,H,0.4183,0.5974,0.4026,France,0.5974,,False,,,
+99,2026-07-11,21:00,Quarter-finals,True,Norway,England,0.2562,0.2274,0.5164,A,0.5164,0.3513,0.6487,England,0.6487,,False,,,
+1,2026-06-11,19:00,Group Stage,False,Mexico,South Africa,0.639,0.2444,0.1166,H,0.639,,,,,,True,H,2-0,True
+2,2026-06-11,23:00,Group Stage,False,South Korea,Czechia,0.4924,0.2486,0.259,H,0.4924,,,,,,True,H,2-1,True
+3,2026-06-12,19:00,Group Stage,False,Canada,Bosnia and Herzegovina,0.7444,0.1726,0.0831,H,0.7444,,,,,,True,D,1-1,False
+4,2026-06-12,23:00,Group Stage,False,USA,Paraguay,0.4589,0.2858,0.2553,H,0.4589,,,,,,True,H,4-1,True
+5,2026-06-13,15:00,Group Stage,False,Qatar,Switzerland,0.1364,0.1819,0.6817,A,0.6817,,,,,,True,D,1-1,False
+6,2026-06-13,18:00,Group Stage,False,Brazil,Morocco,0.3841,0.3222,0.2937,H,0.3841,,,,,,True,D,1-1,False
+7,2026-06-13,21:00,Group Stage,False,Haiti,Scotland,0.2867,0.2469,0.4664,A,0.4664,,,,,,True,A,0-1,True
+8,2026-06-13,23:59,Group Stage,False,Australia,Türkiye,0.497,0.2537,0.2492,H,0.497,,,,,,True,H,2-0,True
+9,2026-06-14,15:00,Group Stage,False,Germany,Curaçao,0.8157,0.1215,0.0627,H,0.8157,,,,,,True,H,7-1,True
+10,2026-06-14,18:00,Group Stage,False,Netherlands,Japan,0.3644,0.2544,0.3812,A,0.3812,,,,,,True,D,2-2,False
+11,2026-06-14,21:00,Group Stage,False,Côte d'Ivoire,Ecuador,0.2383,0.3369,0.4248,A,0.4248,,,,,,True,H,1-0,False
+12,2026-06-14,23:59,Group Stage,False,Sweden,Tunisia,0.3583,0.2786,0.3631,A,0.3631,,,,,,True,H,5-1,False
+13,2026-06-15,15:00,Group Stage,False,Spain,Cabo Verde,0.8534,0.1076,0.039,H,0.8534,,,,,,True,D,0-0,False
+14,2026-06-15,18:00,Group Stage,False,Belgium,Egypt,0.5251,0.2748,0.2001,H,0.5251,,,,,,True,D,1-1,False
+15,2026-06-15,21:00,Group Stage,False,Saudi Arabia,Uruguay,0.1614,0.3027,0.5359,A,0.5359,,,,,,True,D,1-1,False
+16,2026-06-15,23:59,Group Stage,False,IR Iran,New Zealand,0.5201,0.253,0.2269,H,0.5201,,,,,,True,D,2-2,False
+17,2026-06-16,15:00,Group Stage,False,France,Senegal,0.4821,0.2813,0.2365,H,0.4821,,,,,,True,H,3-1,True
+18,2026-06-16,18:00,Group Stage,False,Iraq,Norway,0.2001,0.2454,0.5544,A,0.5544,,,,,,True,A,1-4,True
+19,2026-06-16,21:00,Group Stage,False,Argentina,Algeria,0.6302,0.2353,0.1345,H,0.6302,,,,,,True,H,3-0,True
+20,2026-06-16,23:59,Group Stage,False,Austria,Jordan,0.482,0.2571,0.2609,H,0.482,,,,,,True,H,3-1,True
+21,2026-06-17,15:00,Group Stage,False,Portugal,Congo DR,0.6177,0.2467,0.1356,H,0.6177,,,,,,True,D,1-1,False
+22,2026-06-17,18:00,Group Stage,False,England,Croatia,0.5391,0.2647,0.1962,H,0.5391,,,,,,True,H,4-2,True
+23,2026-06-17,21:00,Group Stage,False,Ghana,Panama,0.3294,0.267,0.4036,A,0.4036,,,,,,True,H,1-0,False
+24,2026-06-17,23:59,Group Stage,False,Uzbekistan,Colombia,0.1959,0.2838,0.5203,A,0.5203,,,,,,True,A,1-3,True
+25,2026-06-18,15:00,Group Stage,False,Mexico,South Korea,0.5179,0.2858,0.1963,H,0.5179,,,,,,True,H,1-0,True
+26,2026-06-18,18:00,Group Stage,False,Czechia,South Africa,0.4547,0.2703,0.2749,H,0.4547,,,,,,True,D,1-1,False
+27,2026-06-18,21:00,Group Stage,False,Canada,Qatar,0.6796,0.1999,0.1205,H,0.6796,,,,,,True,H,6-0,True
+28,2026-06-18,23:59,Group Stage,False,Switzerland,Bosnia and Herzegovina,0.6757,0.2005,0.1238,H,0.6757,,,,,,True,H,4-1,True
+29,2026-06-19,15:00,Group Stage,False,Brazil,Haiti,0.801,0.1354,0.0636,H,0.801,,,,,,True,H,3-0,True
+30,2026-06-19,18:00,Group Stage,False,Scotland,Morocco,0.1741,0.2908,0.5351,A,0.5351,,,,,,True,A,0-1,True
+31,2026-06-19,21:00,Group Stage,False,USA,Australia,0.3537,0.2922,0.354,A,0.354,,,,,,True,H,2-0,False
+32,2026-06-19,23:59,Group Stage,False,Türkiye,Paraguay,0.4279,0.2634,0.3087,H,0.4279,,,,,,True,A,0-1,False
+33,2026-06-20,15:00,Group Stage,False,Germany,Côte d'Ivoire,0.5847,0.2262,0.1891,H,0.5847,,,,,,True,H,2-1,True
+34,2026-06-20,18:00,Group Stage,False,Ecuador,Curaçao,0.7404,0.1844,0.0753,H,0.7404,,,,,,True,D,0-0,False
+35,2026-06-20,21:00,Group Stage,False,Netherlands,Sweden,0.5865,0.1977,0.2158,H,0.5865,,,,,,True,H,5-1,True
+36,2026-06-20,23:59,Group Stage,False,Tunisia,Japan,0.1573,0.2242,0.6185,A,0.6185,,,,,,True,A,0-4,True
+37,2026-06-21,15:00,Group Stage,False,Belgium,IR Iran,0.497,0.2528,0.2502,H,0.497,,,,,,True,D,0-0,False
+38,2026-06-21,18:00,Group Stage,False,New Zealand,Egypt,0.3308,0.2998,0.3694,A,0.3694,,,,,,True,A,1-3,True
+39,2026-06-21,21:00,Group Stage,False,Spain,Saudi Arabia,0.7516,0.1766,0.0718,H,0.7516,,,,,,True,H,4-0,True
+40,2026-06-21,23:59,Group Stage,False,Uruguay,Cabo Verde,0.5881,0.2839,0.128,H,0.5881,,,,,,True,D,2-2,False
+41,2026-06-22,15:00,Group Stage,False,France,Iraq,0.7617,0.1642,0.0741,H,0.7617,,,,,,True,H,3-0,True
+42,2026-06-22,18:00,Group Stage,False,Norway,Senegal,0.4574,0.2484,0.2942,H,0.4574,,,,,,True,H,3-2,True
+43,2026-06-22,21:00,Group Stage,False,Argentina,Austria,0.6681,0.2193,0.1125,H,0.6681,,,,,,True,H,2-0,True
+44,2026-06-22,23:59,Group Stage,False,Jordan,Algeria,0.2697,0.2475,0.4828,A,0.4828,,,,,,True,A,1-2,True
+45,2026-06-23,15:00,Group Stage,False,Portugal,Uzbekistan,0.6363,0.2228,0.1409,H,0.6363,,,,,,True,H,5-0,True
+46,2026-06-23,18:00,Group Stage,False,Colombia,Congo DR,0.5896,0.2656,0.1448,H,0.5896,,,,,,True,H,1-0,True
+47,2026-06-23,21:00,Group Stage,False,England,Ghana,0.7291,0.1845,0.0864,H,0.7291,,,,,,True,D,0-0,False
+48,2026-06-23,23:59,Group Stage,False,Panama,Croatia,0.2341,0.2358,0.5301,A,0.5301,,,,,,True,A,0-1,True
+49,2026-06-24,18:00,Group Stage,False,Czechia,Mexico,0.2623,0.3124,0.4253,A,0.4253,,,,,,True,A,0-3,True
+50,2026-06-24,18:00,Group Stage,False,South Africa,South Korea,0.2362,0.273,0.4908,A,0.4908,,,,,,True,H,1-0,False
+51,2026-06-24,22:00,Group Stage,False,Switzerland,Canada,0.504,0.2602,0.2359,H,0.504,,,,,,True,H,2-1,True
+52,2026-06-24,22:00,Group Stage,False,Bosnia and Herzegovina,Qatar,0.4432,0.2476,0.3092,H,0.4432,,,,,,True,H,3-1,True
+53,2026-06-25,18:00,Group Stage,False,Scotland,Brazil,0.1083,0.2076,0.6841,A,0.6841,,,,,,True,A,0-3,True
+54,2026-06-25,18:00,Group Stage,False,Morocco,Haiti,0.7589,0.1653,0.0758,H,0.7589,,,,,,True,H,4-2,True
+55,2026-06-25,22:00,Group Stage,False,Türkiye,USA,0.403,0.2593,0.3377,H,0.403,,,,,,True,H,3-2,True
+56,2026-06-25,22:00,Group Stage,False,Paraguay,Australia,0.2669,0.3102,0.4229,A,0.4229,,,,,,True,D,0-0,False
+57,2026-06-26,18:00,Group Stage,False,Ecuador,Germany,0.2922,0.2923,0.4155,A,0.4155,,,,,,True,H,2-1,False
+58,2026-06-26,18:00,Group Stage,False,Curaçao,Côte d'Ivoire,0.1204,0.225,0.6546,A,0.6546,,,,,,True,A,0-2,True
+59,2026-06-26,22:00,Group Stage,False,Tunisia,Netherlands,0.1033,0.1635,0.7331,A,0.7331,,,,,,True,A,1-3,True
+60,2026-06-26,22:00,Group Stage,False,Japan,Sweden,0.6243,0.1983,0.1774,H,0.6243,,,,,,True,D,1-1,False
+65,2026-06-26,18:00,Group Stage,False,Norway,France,0.257,0.2286,0.5144,A,0.5144,,,,,,True,A,1-4,True
+66,2026-06-26,18:00,Group Stage,False,Senegal,Iraq,0.6196,0.2336,0.1468,H,0.6196,,,,,,True,H,5-0,True
+61,2026-06-27,18:00,Group Stage,False,New Zealand,Belgium,0.1038,0.1545,0.7417,A,0.7417,,,,,,True,A,1-5,True
+62,2026-06-27,18:00,Group Stage,False,Egypt,IR Iran,0.3428,0.323,0.3341,H,0.3428,,,,,,True,D,1-1,False
+63,2026-06-27,22:00,Group Stage,False,Uruguay,Spain,0.1781,0.2741,0.5477,A,0.5477,,,,,,True,A,0-1,True
+64,2026-06-27,22:00,Group Stage,False,Cabo Verde,Saudi Arabia,0.3754,0.3517,0.273,H,0.3754,,,,,,True,D,0-0,False
+67,2026-06-27,22:00,Group Stage,False,Jordan,Argentina,0.0463,0.1297,0.824,A,0.824,,,,,,True,A,1-3,True
+68,2026-06-27,22:00,Group Stage,False,Algeria,Austria,0.3585,0.2717,0.3698,A,0.3698,,,,,,True,D,3-3,False
+69,2026-06-28,18:00,Group Stage,False,Colombia,Portugal,0.3529,0.2927,0.3544,A,0.3544,,,,,,True,D,0-0,False
+70,2026-06-28,18:00,Group Stage,False,Congo DR,Uzbekistan,0.5196,0.29,0.1903,H,0.5196,,,,,,True,H,3-1,True
+71,2026-06-28,22:00,Group Stage,False,Panama,England,0.0991,0.1998,0.7011,A,0.7011,,,,,,True,A,0-2,True
+72,2026-06-28,22:00,Group Stage,False,Croatia,Ghana,0.5429,0.2607,0.1964,H,0.5429,,,,,,True,H,2-1,True
+73,2026-06-29,12:00,Round of 32,True,South Africa,Canada,0.2234,0.2909,0.4857,A,0.4857,0.3425,0.6575,Canada,0.6575,Canada,True,A,0-1,True
+74,2026-06-29,23:00,Round of 32,True,Brazil,Japan,0.5021,0.2648,0.2331,H,0.5021,0.6582,0.3418,Brazil,0.6582,Brazil,True,H,2-1,True
+75,2026-06-30,02:30,Round of 32,True,Germany,Paraguay,0.5864,0.231,0.1826,H,0.5864,0.7329,0.2671,Germany,0.7329,Paraguay,True,D,1-1,False
+76,2026-06-30,07:00,Round of 32,True,Netherlands,Morocco,0.3541,0.2905,0.3554,A,0.3554,0.4992,0.5008,Morocco,0.5008,Morocco,True,D,1-1,True
+77,2026-06-30,23:00,Round of 32,True,Côte d'Ivoire,Norway,0.3392,0.2599,0.4009,A,0.4009,0.464,0.536,Norway,0.536,Norway,True,A,1-2,True
+78,2026-07-01,03:00,Round of 32,True,France,Sweden,0.759,0.1499,0.0912,H,0.759,0.8685,0.1315,France,0.8685,France,True,H,3-0,True
+79,2026-07-01,07:00,Round of 32,True,Mexico,Ecuador,0.4632,0.3675,0.1693,H,0.4632,0.6898,0.3102,Mexico,0.6898,Mexico,True,H,2-0,True
+80,2026-07-01,22:00,Round of 32,True,England,Congo DR,0.5719,0.2885,0.1396,H,0.5719,0.7624,0.2376,England,0.7624,England,True,H,2-1,True
+81,2026-07-02,02:00,Round of 32,True,Belgium,Senegal,0.4924,0.2485,0.2591,H,0.4924,0.6353,0.3647,Belgium,0.6353,Belgium,True,D,2-2,True
+82,2026-07-02,06:00,Round of 32,True,USA,Bosnia and Herzegovina,0.7189,0.1766,0.1045,H,0.7189,0.8449,0.1551,USA,0.8449,USA,True,H,2-0,True
+83,2026-07-03,01:00,Round of 32,True,Spain,Austria,0.7478,0.1662,0.086,H,0.7478,0.87,0.13,Spain,0.87,Spain,True,H,3-0,True
+84,2026-07-03,05:00,Round of 32,True,Portugal,Croatia,0.5847,0.2296,0.1857,H,0.5847,0.7298,0.2702,Portugal,0.7298,Portugal,True,H,2-1,True
+85,2026-07-03,09:00,Round of 32,True,Switzerland,Algeria,0.5458,0.2352,0.2191,H,0.5458,0.6883,0.3117,Switzerland,0.6883,Switzerland,True,H,2-0,True
+86,2026-07-04,00:00,Round of 32,True,Australia,Egypt,0.3909,0.3425,0.2666,H,0.3909,0.5776,0.4224,Australia,0.5776,Egypt,True,D,1-1,False
+87,2026-07-04,04:00,Round of 32,True,Argentina,Cabo Verde,0.7689,0.1694,0.0617,H,0.7689,0.8988,0.1012,Argentina,0.8988,Argentina,True,D,1-1,True
+88,2026-07-04,07:30,Round of 32,True,Colombia,Ghana,0.6428,0.2479,0.1093,H,0.6428,0.8157,0.1843,Colombia,0.8157,Colombia,True,H,1-0,True
+89,2026-07-04,21:00,Round of 16,True,Paraguay,France,0.1342,0.2519,0.614,A,0.614,0.2168,0.7832,France,0.7832,France,True,A,0-1,True
+90,2026-07-04,23:00,Round of 16,True,Canada,Morocco,0.2376,0.3101,0.4522,A,0.4522,0.3693,0.6307,Morocco,0.6307,Morocco,True,A,0-3,True
+91,2026-07-05,20:00,Round of 16,True,Brazil,Norway,0.6428,0.1929,0.1643,H,0.6428,0.7692,0.2308,Brazil,0.7692,Norway,True,A,1-2,False
+92,2026-07-06,01:00,Round of 16,True,Mexico,England,0.3262,0.3161,0.3577,A,0.3577,0.4808,0.5192,England,0.5192,England,True,A,2-3,True
+93,2026-07-06,19:00,Round of 16,True,Portugal,Spain,0.2686,0.2781,0.4533,A,0.4533,0.3906,0.6094,Spain,0.6094,Spain,True,A,0-1,True
+94,2026-07-07,00:00,Round of 16,True,USA,Belgium,0.2666,0.2397,0.4937,A,0.4937,0.3692,0.6308,Belgium,0.6308,Belgium,True,A,1-4,True

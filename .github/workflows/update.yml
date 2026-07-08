@@ -1,12 +1,11 @@
 name: Update predictions & deploy
 
 # Re-pull data, re-run the model, rebuild the site and deploy to GitHub Pages.
-# Runs hourly so predictions and the track record are refreshed soon after the
-# upstream CC0 datasets record each result (knockout matches come thick and fast).
-# Also runnable on demand.
+# Runs once a day at 07:00 UTC, after the upstream CC0 datasets have recorded the
+# previous day's results. Also runnable on demand.
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "0 7 * * *"
   workflow_dispatch:
   push:
     branches: [main]
